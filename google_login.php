@@ -49,8 +49,9 @@ function addUidTokenJson($uid,$token,$channelAccessToken){
 }
 
 
-function getCalendarEvents($client,$channelAccessToken){
-    $reply ='';
+
+function getCalendarEvents($client){
+    $reply = '';
     $service = new Google_Service_Calendar($client);
     $calendarId = 'primary';
     
@@ -73,11 +74,30 @@ function getCalendarEvents($client,$channelAccessToken){
             if (empty($start)) {
                 $start = $event->start->date;
             }
-            $reply .= $event->getSummary(). $start .'\n';
-            // var_dump($event->getSummary(), $start);
+            $item = buildCarouselItem($event->getSummary(),$start);
+            array_push($events_array, $item);
         }
-        pushMessage($_GET['state'],$reply,$channelAccessToken);
     }
+    return $events_array; 
+}
+
+function buildCarouselItem($event,$time){
+    $item = [];
+    $item['title'] = $event;
+    $item['text'] = $time;
+    $item['actions'] = [
+                            [
+                                'type' => 'message', 
+                                'label' => '取消預約', // 顯示在 btn 的字
+                                'text' => '取消預約' // 用戶發送文字
+                            ],
+                            [
+                                'type' => 'message', 
+                                'label' => '改時間', 
+                                'text' => '改時間'
+                            ]
+                        ];
+    return $item;
 }
 
 

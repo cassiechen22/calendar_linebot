@@ -61,7 +61,7 @@ foreach ($linebot->parseEvents() as $event) {
                         if($token=='false'){
                             // 產生新的 token 並存起來
                             $authUrl = $client->createAuthUrl();
-                            replyMessage($linebot,$event['replyToken'],$authUrl);
+                            replyAuth($linebot,$event['replyToken'],$authUrl);
                         } else {
                             // 有token
                             // $a = var_export($client,1);
@@ -71,14 +71,14 @@ foreach ($linebot->parseEvents() as $event) {
                                     $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
                                     $events = getCalendarEvents($client);
                                     
-                                    replyMessage($linebot,$event['replyToken'],$events);
+                                    replyEvents($linebot,$event['replyToken'],$events);
                                 } else {
                                     $authUrl = $client->createAuthUrl();
-                                    replyMessage($linebot,$event['replyToken'],$authUrl);
+                                    replyAuth($linebot,$event['replyToken'],$authUrl);
                                 }
                             } else{
                                 $events = getCalendarEvents($client);   
-                                replyMessage($linebot,$event['replyToken'],$events);
+                                replyEvents($linebot,$event['replyToken'],$events);
                             }
                         }
 
@@ -107,13 +107,11 @@ function setGoogleClient($uid){
     return $client;
 }
 
-
 function findTokenByUid($uid){
     $getContent = file_get_contents(__DIR__.'/token.json');
     $decodeContent = json_decode($getContent, true); 
     return (array_key_exists($uid, $decodeContent)) ? $decodeContent[$uid] : 'false';
 }
-
 
 function getCalendarEvents($client){
     $reply = '';
@@ -139,14 +137,50 @@ function getCalendarEvents($client){
             if (empty($start)) {
                 $start = $event->start->date;
             }
-            $reply .= $event->getSummary() ."\n". $start ."\n";
-            // var_dump($event->getSummary(), $start);
+            $item = buildCarouselItem($event->getSummary(),$start);
+            array_push($events_array, $item);
         }
     }
-    return $reply; 
+    return $events_array; 
 }
 
-function replyMessage($linebot, $replyToken, $message) {
+function buildCarouselItem($event,$time){
+    $item = [];
+    $item['title'] = $event;
+    $item['text'] = $time;
+    $item['actions'] = [
+                            [
+                                'type' => 'message', 
+                                'label' => '取消預約', // 顯示在 btn 的字
+                                'text' => '取消預約' // 用戶發送文字
+                            ],
+                            [
+                                'type' => 'message', 
+                                'label' => '改時間', 
+                                'text' => '改時間'
+                            ]
+                        ];
+    return $item;
+}
+
+function replyEvents($linebot, $replyToken, $events) {
+    $linebot->replyMessage([
+        'replyToken' => $replyToken,
+        'messages' => [
+            [
+                'type' => 'template', 
+                'altText' => 'Click to see more details', 
+                'template' => [
+                    'type' => 'carousel', 
+                    'columns' => $events
+                ]
+            ]
+        ]
+    ]);
+    
+}
+
+function replyAuth($linebot, $replyToken, $message) {
     $linebot->replyMessage([
         'replyToken' => $replyToken,
         'messages' => [

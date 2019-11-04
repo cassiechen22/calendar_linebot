@@ -1,20 +1,26 @@
 <?php
-
-function buildCarouselItem($event,$time){
+function buildCarouselItem($event,$start,$end,$id){
     $item = [];
     $item['title'] = $event;
-    $item['text'] = $time;
+    $item['text'] = $start.' ~ ' . $end;
     $item['actions'] = [
                             [
-                                'type' => 'message', 
-                                'label' => '取消預約', // 顯示在 btn 的字
-                                'text' => '取消預約' // 用戶發送文字
+                                'type' => 'postback', 
+                                'label' => '取消活動', // 顯示在 btn 的字
+                                'data' => $id
                             ],
                             [
-                                'type' => 'message', 
-                                'label' => '改時間', 
-                                'text' => '改時間'
-                            ]
+                                "type" => "datetimepicker",
+                                "label" => "更改活動開始時間",
+                                "data" => 'action/edit/eventId/'.$id.'/start',
+                                "mode" => "datetime"
+                            ],
+                            [
+                                "type" => "datetimepicker",
+                                "label" => "更改活動結束時間",
+                                "data" => 'action/edit/eventId/'.$id.'/end',
+                                "mode" => "datetime"
+                            ],
                         ];
     return $item;
 }
@@ -36,7 +42,7 @@ function replyEvents($linebot, $replyToken, $events) {
     
 }
 
-function replyAuth($linebot, $replyToken, $message) {
+function replyText($linebot, $replyToken, $message) {
     $linebot->replyMessage([
         'replyToken' => $replyToken,
         'messages' => [

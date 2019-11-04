@@ -20,9 +20,10 @@ if(!empty($_GET['code'])){
     $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
     $client->setAccessToken($accessToken);
 
-    addUidTokenJson($_GET['state'],$client->getAccessToken(),$channelAccessToken);
+    $uid = $_GET['state'];
+    addUidTokenJson($uid,$client->getAccessToken(),$channelAccessToken);
 
-    // echo "<script type='text/javascript'>window.close();</script>";
-
-    getCalendarEvents($client,$channelAccessToken);
+    $linebot = new LINEBotTiny($channelAccessToken, $channelSecret);
+    $events = getCalendarEvents($client);
+    replyEvents($linebot,$_SESSION[$uid],$events);
 }

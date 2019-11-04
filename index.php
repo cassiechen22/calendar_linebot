@@ -1,54 +1,88 @@
 <?php
 
 require_once('setConfig.php');
+require_once('calendarService.php');
+
+session_start();
 
 // when user request
 $linebot = new LINEBotTiny($channelAccessToken, $channelSecret);
 foreach ($linebot->parseEvents() as $event) {
     logMessage($event);
+    $_SESSION[$event['source']['userId']] = $event['replyToken'];
     switch ($event['type']) {
         case 'message':
             $message = $event['message'];
             switch ($message['type']) {
                 case 'text':
-                    if($message['text']=='日曆' || $message['text']=='預約'){
+                    if($message['text']=='日曆'){
+                        $result = setGoogleClient($event['source']['userId']);
                         
-                        // 開一個 client
-                        $client = setGoogleClient($event['source']['userId']);
-
-                        // 利用此 uid 去 token file 找這個人的 token
-                        $token = findTokenByUid($event['source']['userId']);
-
-                        if($token=='false'){
-                            // 產生新的 token 並存起來
-                            $authUrl = $client->createAuthUrl();
-                            replyAuth($linebot,$event['replyToken'],$authUrl);
-                        } else {
-                            // 有token
-                            // $a = var_export($client,1);
-                            $client->setAccessToken($token);
-                            if ($client->isAccessTokenExpired()) {
-                                if ($client->getRefreshToken()) {
-                                    $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-                                    $events = getCalendarEvents($client);
-                                    replyEvents($linebot,$event['replyToken'],$events);
-                                } else {
-                                    $authUrl = $client->createAuthUrl();
-                                    replyAuth($linebot,$event['replyToken'],$authUrl);
-                                }
-                            } else{
-                                $events = getCalendarEvents($client);   
-                                replyEvents($linebot,$event['replyToken'],$events);
-                            }
+                        if(gettype($result) == string){
+                            replyText($linebot,$event['replyToken'],$result);
+                        } else{
+                            $events = getCalendarEvents($result);   
+                            replyEvents($linebot,$event['replyToken'],$events);
                         }
-
                     }
                     break;
+        
                 default:
                     error_log('Unsupported message type: ' . $message['type']);
                     break;
             }
             break;
+        case 'postback':
+            // $event['postback']['params']['datetime']
+            // $event['postback']['data'] 
+            // $message = var_export($event['postback']['data'], 1);
+
+            $message = $event['postback']['data'];
+            $dataArray = explode('/', $message);
+            $action = $dataArray[1];
+            $eventId = $dataArray[3];
+            switch ($action){
+                case 'cancel':
+                    $uid = $event['source']['userId'];
+                    $result = setGoogleClient($uid);
+                        
+                    if( gettype($result) == string){
+                        replyText($linebot,$event['replyToken'],$authUrl);
+                    } else{
+                        $status = cancelEvent($result,$eventId);
+                        replyText($linebot,$event['replyToken'],$status);
+                    }
+                break;
+
+                case 'edit':
+                    $uid = $event['source']['userId'];
+                    $result = setGoogleClient($uid);
+                    $time_type = $dataArray[4];
+                    if($time_type == 'start'){
+                        $start_time = $event['postback']['params']['datetime'];
+                        $_SESSION[$uid.'start'] = $start_time;
+                        replyText($linebot,$event['replyToken'],"set start time : $start_time \nPlease request calendar again to see new event list.");
+                    } else {
+                        $end_time = $event['postback']['params']['datetime'];
+                        $_SESSION[$uid.'end'] = $end_time;
+                        $_SESSION[$event['source']['userId']] = $event['replyToken'];
+                        replyText($linebot,$event['replyToken'],"set end time : $end_time \nPlease request calendar again to see new event list.");
+                    }
+                    
+                    if( gettype($result) == string){
+                        replyText($linebot,$event['replyToken'],$authUrl);
+                    } else{
+                        $status = editEvent($result,$eventId,$_SESSION[$uid.'start'],$_SESSION[$uid.'end']);
+                        // pushMessage($uid,$status,$channelAccessToken);
+                    }
+                break;
+
+                case 'new':
+                break;
+            }
+            
+            break;
+            
         default:
             error_log('Unsupported event type: ' . $event['type']);
             break;

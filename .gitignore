@@ -7,3 +7,5 @@ vendor/
 token.json
 credentials.json
 .history/
+recievedMessage.txt
+config.ini

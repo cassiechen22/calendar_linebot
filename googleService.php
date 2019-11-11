@@ -7,7 +7,7 @@ function setGoogleClient($uid){
     $client->setAuthConfig(__DIR__.'/credentials.json');
     $client->setAccessType('offline');
     $client->setPrompt('select_account consent');
-    $client->setRedirectUri('https://979ac3cb.ngrok.io/bot/google_login.php');
+    $client->setRedirectUri('https://9846eab4.ngrok.io/bot/google_login.php');
     $client->setState($uid);
 
     // 利用此 uid 去 token file 找這個人的 token

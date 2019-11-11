@@ -7,7 +7,7 @@ function buildCarouselItem($event,$start,$end,$id){
                             [
                                 'type' => 'postback', 
                                 'label' => '取消活動', // 顯示在 btn 的字
-                                'data' => $id
+                                'data' => 'action/cancel/eventId/'.$id
                             ],
                             [
                                 "type" => "datetimepicker",
@@ -64,11 +64,19 @@ function pushMessage($uid,$message,$channelAccessToken) {
 
     $post_data = array(
         'to' => $uid,
-        'messages'=> [["type" => "text", "text" => $message]],
+        'messages' => [
+            [
+                'type' => 'template', 
+                'altText' => 'Click to see more details', 
+                'template' => [
+                    'type' => 'carousel', 
+                    'columns' => $message
+                ]
+            ]
+        ]
     );
 
     $post_data = json_encode($post_data);
-    // $post_data = json_decode($post_data);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

@@ -33,10 +33,6 @@ foreach ($linebot->parseEvents() as $event) {
             }
             break;
         case 'postback':
-            // $event['postback']['params']['datetime']
-            // $event['postback']['data'] 
-            // $message = var_export($event['postback']['data'], 1);
-
             $message = $event['postback']['data'];
             $dataArray = explode('/', $message);
             $action = $dataArray[1];

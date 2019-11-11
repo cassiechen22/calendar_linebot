@@ -2,6 +2,7 @@
 
 require_once('setConfig.php');
 
+
 function cancelEvent($client,$eventId){
     try {
         $service = new Google_Service_Calendar($client);
@@ -29,7 +30,21 @@ function editEvent($client,$eventId,$start,$end){
 }
 
 function newEvent($summary,$start,$end){
-
+    // $start = 2019-11-24 20:00
+ 
+    $event = new Google_Service_Calendar_Event([
+        'summary' => $summary,
+        'start' => [
+            'dateTime' => formatDateTime($start),
+            'timeZone' => $default_timezone,
+        ],
+        'end' => [
+            'dateTime' => formatDateTime($end),
+            'timeZone' => $default_timezone,
+        ],
+    ]);
+    
+    $event = $service->events->insert('primary', $event);
 }
 
 function formatDateTime($dateTime){

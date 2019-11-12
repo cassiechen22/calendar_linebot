@@ -21,8 +21,12 @@ foreach ($linebot->parseEvents() as $event) {
                         if(gettype($result) == string){
                             replyText($linebot,$event['replyToken'],$result);
                         } else{
-                            $events = getCalendarEvents($result);   
-                            replyEvents($linebot,$event['replyToken'],$events);
+                            $events = getCalendarEvents($result);
+                            if(empty($events)){
+                                replyText($linebot,$event['replyToken'],"您還沒有任何活動唷！");
+                            } else {
+                                replyEvents($linebot,$event['replyToken'],$events);
+                            }  
                         }
                     }
                     break;

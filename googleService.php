@@ -68,9 +68,7 @@ function getCalendarEvents($client){
     $events_array = [];
     $eventIds_array = [];
 
-    if (empty($events)) {
-        $reply = "No upcoming events found.\n";
-    } else {
+    if (!empty($events)) {
         foreach ($events as $event) {
             $start = $event->start->dateTime;
             $end = $event->end->dateTime;

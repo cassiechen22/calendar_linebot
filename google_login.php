@@ -26,5 +26,9 @@ if(!empty($_GET['code'])){
     addUidTokenJson($uid,$client->getAccessToken(),$channelAccessToken);
 
     $events = getCalendarEvents($client);
-    pushMessage($uid,$events,$channelAccessToken);
+    if(empty($events)){
+        pushMessage($uid,"您還沒有任何活動唷！",$channelAccessToken);
+    } else {
+        pushMessage($uid,$events,$channelAccessToken);
+    }  
 }

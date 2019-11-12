@@ -39,7 +39,6 @@ function replyEvents($linebot, $replyToken, $events) {
             ]
         ]
     ]);
-    
 }
 
 function replyText($linebot, $replyToken, $message) {
@@ -61,20 +60,32 @@ function pushMessage($uid,$message,$channelAccessToken) {
         'Content-Type: application/json',
         'Authorization: '.$token
     );
-
-    $post_data = array(
-        'to' => $uid,
-        'messages' => [
-            [
-                'type' => 'template', 
-                'altText' => 'Click to see more details', 
-                'template' => [
-                    'type' => 'carousel', 
-                    'columns' => $message
+    if(gettype($message) == string){
+        $post_data = array(
+            'to' => $uid,
+            'messages' => [
+                [
+                    'type' => 'text',
+                    'text' => $message
                 ]
             ]
-        ]
-    );
+        );
+    } else {
+        $post_data = array(
+            'to' => $uid,
+            'messages' => [
+                [
+                    'type' => 'template', 
+                    'altText' => 'Click to see more details', 
+                    'template' => [
+                        'type' => 'carousel', 
+                        'columns' => $message
+                    ]
+                ]
+            ]
+        );
+    }
+    
 
     $post_data = json_encode($post_data);
     $ch = curl_init();

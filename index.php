@@ -29,6 +29,10 @@ foreach ($linebot->parseEvents() as $event) {
                             }  
                         }
                     }
+                    else if($message['text']=='換帳號'){
+                        $result = deleteClient($event['source']['userId']);
+                        replyText($linebot,$event['replyToken'],$result);
+                    }
                     break;
         
                 default:

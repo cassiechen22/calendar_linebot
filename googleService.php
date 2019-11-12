@@ -51,6 +51,25 @@ function addUidTokenJson($uid,$token){
     file_put_contents($tokenPath,json_encode($decodeContent));
 }
 
+function deleteClient($uid){
+    $tokenPath = __DIR__.'/token.json';
+    $getContent = file_get_contents($tokenPath);
+    $decodeContent = json_decode($getContent, true); 
+    if(array_key_exists($uid, $decodeContent)){
+        unset($decodeContent[$uid]);
+        file_put_contents($tokenPath,json_encode($decodeContent));
+        $result = findTokenByUid($uid);
+        if($result == "false") {
+            $status = "已刪除囉，重新輸入「日曆」登入新帳號唷！";
+        } else {
+            $status = "發生一點小錯誤，哭哭QQ";
+        }
+    } else {
+        $status = "Oops！您尚未使用過此服務，請輸入「日曆」登入帳號";
+    }
+    return $status;
+}
+
 function getCalendarEvents($client){
     $reply = '';
     $service = new Google_Service_Calendar($client);

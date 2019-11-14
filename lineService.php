@@ -53,6 +53,37 @@ function replyText($linebot, $replyToken, $message) {
     ]);
 }
 
+function replyDatetimePicker($linebot, $replyToken, $message){
+    $linebot->replyMessage([
+        'replyToken' => $replyToken,
+        'messages' => [
+            [
+                'type' => 'template', 
+                'altText' => 'Click to see more details', 
+                'template' => [
+                    'type' => 'buttons', 
+                    'text' => $message,
+                    "actions" => [
+                        [
+                            "type" => "datetimepicker",
+                            "data" => "action/create/event_name/". $message .'/1', 
+                            "label" => "課程一小時",
+                            "mode" => "datetime", 
+                        ],
+                        [
+                            "type" => "datetimepicker",
+                            "data" => "action/create/event_name/". $message .'/1.5', 
+                            "label" => "課程一個半小時",
+                            "mode" => "datetime", 
+                        ],
+                    ],
+                ]
+            ]
+        ]
+    ]);
+}
+
+
 function pushMessage($uid,$message,$channelAccessToken) {
     $token = 'Bearer '.$channelAccessToken;
     $url = 'https://api.line.me/v2/bot/message/push';

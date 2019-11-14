@@ -2,7 +2,6 @@
 
 require_once('setConfig.php');
 
-
 function cancelEvent($client,$eventId){
     try {
         $service = new Google_Service_Calendar($client);
@@ -29,22 +28,36 @@ function editEvent($client,$eventId,$start,$end){
     
 }
 
-function newEvent($summary,$start,$end){
-    // $start = 2019-11-24 20:00
- 
+function createEvent($client,$eventId,$start,$hour){
+    $start = $start . ':00';
+    
+    if($hour == 1){
+        $onehour = strtotime($start) + 3600; 
+        $end = date('Y-m-d\TH:i:s',$onehour);
+    } else {
+        $halfhour = strtotime($start) + 5400; 
+        $end = date('Y-m-d\TH:i:s',$halfhour);
+    }
+    
+    $service = new Google_Service_Calendar($client);
     $event = new Google_Service_Calendar_Event([
-        'summary' => $summary,
+        'summary' => $eventId,
         'start' => [
-            'dateTime' => formatDateTime($start),
-            'timeZone' => $default_timezone,
+            'dateTime' => $start,
+            'timeZone' => 'Asia/Taipei',
         ],
         'end' => [
-            'dateTime' => formatDateTime($end),
-            'timeZone' => $default_timezone,
+            'dateTime' => $end,
+            'timeZone' => 'Asia/Taipei',
         ],
     ]);
     
     $event = $service->events->insert('primary', $event);
+    if(empty($event->getId())){
+        return '新增失敗，重新再輸入一次';
+    } else {
+        return '建立成功囉！請再次輸入「日曆」看看最新的活動吧';
+    }
 }
 
 function formatDateTime($dateTime){

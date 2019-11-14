@@ -18,7 +18,7 @@ foreach ($linebot->parseEvents() as $event) {
                     if($message['text']=='日曆'){
                         $result = setGoogleClient($event['source']['userId']);
                         
-                        if(gettype($result) == string){
+                        if(gettype($result) == 'string'){
                             replyText($linebot,$event['replyToken'],$result);
                         } else{
                             $events = getCalendarEvents($result);
@@ -29,9 +29,22 @@ foreach ($linebot->parseEvents() as $event) {
                             }  
                         }
                     }
+                    
                     else if($message['text']=='換帳號'){
                         $result = deleteClient($event['source']['userId']);
                         replyText($linebot,$event['replyToken'],$result);
+                    }
+                    
+                    else if (strpos($message['text'], '建立') !== false){
+                        $event_name = explode(" ", $message['text']);
+                        
+                        if(empty($event_name[1]) && strlen($event_name[0]) < 7){
+                            replyText($linebot,$event['replyToken'],'您沒有輸入活動名稱QQ');
+                        } else if(strlen($event_name[0]) > 6){
+                            replyText($linebot,$event['replyToken'],'建立跟活動名稱間要有空白格啦 ><   例如：建立 活動');
+                        } else {
+                            replyDatetimePicker($linebot,$event['replyToken'],$event_name[1]);
+                        }
                     }
                     break;
         
@@ -40,6 +53,7 @@ foreach ($linebot->parseEvents() as $event) {
                     break;
             }
             break;
+            
         case 'postback':
             $message = $event['postback']['data'];
             $dataArray = explode('/', $message);
@@ -81,7 +95,13 @@ foreach ($linebot->parseEvents() as $event) {
                     }
                 break;
 
-                case 'new':
+                case 'create':
+                    $hour = $dataArray[4];
+                    $uid = $event['source']['userId'];
+                    
+                    $result = setGoogleClient($uid);
+                    $status = createEvent($result,$eventId,$event['postback']['params']['datetime'],$hour);
+                    replyText($linebot,$event['replyToken'],$status);
                 break;
             }
             

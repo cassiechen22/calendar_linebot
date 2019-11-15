@@ -67,13 +67,13 @@ function replyDatetimePicker($linebot, $replyToken, $message){
                         [
                             "type" => "datetimepicker",
                             "data" => "action/create/event_name/". $message .'/1', 
-                            "label" => "課程一小時",
+                            "label" => "1小時",
                             "mode" => "datetime", 
                         ],
                         [
                             "type" => "datetimepicker",
                             "data" => "action/create/event_name/". $message .'/1.5', 
-                            "label" => "課程一個半小時",
+                            "label" => "1.5小時",
                             "mode" => "datetime", 
                         ],
                     ],

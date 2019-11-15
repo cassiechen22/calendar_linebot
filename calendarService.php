@@ -6,9 +6,9 @@ function cancelEvent($client,$eventId){
     try {
         $service = new Google_Service_Calendar($client);
         $service->events->delete('primary', $eventId);
-        return 'cancel successed. Please request calendar again to see new event list.';
+        return '取消成功囉！請再次輸入「日曆」看看最新的活動吧';
     } catch(Exception $e) {
-        return 'cancel failed. Please request calendar again then click cancel.';
+        return '取消失敗惹QQ 請您在操作一次 ><';
     }
 }
 
@@ -21,9 +21,9 @@ function editEvent($client,$eventId,$start,$end){
         $event->end->timeZone = 'Asia/Taipei';
         $event->end->dateTime = formatDateTime($end);
         $service->events->update('primary', $event->getId(), $event);
-        return 'updated successed. Please request calendar again to see new event list.';
+        return '更新成功囉！請再次輸入「日曆」看看最新的活動吧';
     } catch(Exception $e) {
-        return 'updated failed. Please request calendar again then click cancel.';
+        return '更新失敗惹QQ 請您在操作一次 >< ';
     }
     
 }
@@ -54,7 +54,7 @@ function createEvent($client,$eventId,$start,$hour){
     
     $event = $service->events->insert('primary', $event);
     if(empty($event->getId())){
-        return '新增失敗，重新再輸入一次';
+        return '新增失敗惹QQ 請您在操作一次 ><';
     } else {
         return '建立成功囉！請再次輸入「日曆」看看最新的活動吧';
     }

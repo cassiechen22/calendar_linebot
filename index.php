@@ -23,7 +23,7 @@ foreach ($linebot->parseEvents() as $event) {
                         } else{
                             $events = getCalendarEvents($result);
                             if(empty($events)){
-                                replyText($linebot,$event['replyToken'],"您還沒有任何活動唷！");
+                                replyText($linebot,$event['replyToken'],"快來建立活動～～");
                             } else {
                                 replyEvents($linebot,$event['replyToken'],$events);
                             }  
@@ -64,7 +64,7 @@ foreach ($linebot->parseEvents() as $event) {
                     $uid = $event['source']['userId'];
                     $result = setGoogleClient($uid);
                         
-                    if( gettype($result) == string){
+                    if( gettype($result) == 'string'){
                         replyText($linebot,$event['replyToken'],$authUrl);
                     } else{
                         $status = cancelEvent($result,$eventId);
@@ -75,23 +75,24 @@ foreach ($linebot->parseEvents() as $event) {
                 case 'edit':
                     $uid = $event['source']['userId'];
                     $result = setGoogleClient($uid);
-                    $time_type = $dataArray[4];
-                    if($time_type == 'start'){
-                        $start_time = $event['postback']['params']['datetime'];
-                        $_SESSION[$uid.'start'] = $start_time;
-                        replyText($linebot,$event['replyToken'],"set start time : $start_time \nPlease request calendar again to see new event list.");
-                    } else {
-                        $end_time = $event['postback']['params']['datetime'];
-                        $_SESSION[$uid.'end'] = $end_time;
-                        $_SESSION[$event['source']['userId']] = $event['replyToken'];
-                        replyText($linebot,$event['replyToken'],"set end time : $end_time \nPlease request calendar again to see new event list.");
-                    }
                     
-                    if( gettype($result) == string){
+                    if( gettype($result) == 'string'){
                         replyText($linebot,$event['replyToken'],$authUrl);
                     } else{
+                        $time_type = $dataArray[4];
+
+                        if($time_type == 'start'){
+                            $start_time = $event['postback']['params']['datetime'];
+                            $_SESSION[$uid.'start'] = $start_time;
+                            replyText($linebot,$event['replyToken'],"已設定開始時間 : $start_time \n記得設定結束時間唷！若不需要請輸入「日曆」看看最新變化");
+                        } else {
+                            $end_time = $event['postback']['params']['datetime'];
+                            $_SESSION[$uid.'end'] = $end_time;
+                            $_SESSION[$event['source']['userId']] = $event['replyToken'];
+                            replyText($linebot,$event['replyToken'],"已設定結束時間 : $end_time \n記得設定結束時間唷！若不需要請輸入「日曆」看看最新變化");
+                        }
+                        
                         $status = editEvent($result,$eventId,$_SESSION[$uid.'start'],$_SESSION[$uid.'end']);
-                        // pushMessage($uid,$status,$channelAccessToken);
                     }
                 break;
 

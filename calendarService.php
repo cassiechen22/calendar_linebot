@@ -2,6 +2,27 @@
 
 require_once('setConfig.php');
 
+function getTodayEvents($client){
+    $events = getCalendarEvents($client);
+    $today_events = [];
+    $tomorrow=strtotime("tomorrow");
+
+    foreach($events as $event) {
+        $end = $event->end->dateTime;
+        if (empty($end)) {
+            $end = $event->end->date;
+        }
+        if(strtotime($end) < $tomorrow){
+            $end = date("Y-m-d H:i", strtotime($end));
+            $start = $event->start->dateTime;
+            $start = date("Y-m-d H:i", strtotime($start));
+            $item = buildCarouselItem($event->getSummary(),$start,$end,$event->id);
+            array_push($today_events, $item);
+        }
+    } 
+    return $today_events;
+}
+
 function cancelEvent($client,$eventId){
     try {
         $service = new Google_Service_Calendar($client);

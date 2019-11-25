@@ -15,17 +15,24 @@ foreach ($linebot->parseEvents() as $event) {
             $message = $event['message'];
             switch ($message['type']) {
                 case 'text':
-                    if($message['text']=='日曆'){
+
+                    if($message['text']=='日曆' || $message['text']=='今日行程'){
                         $result = setGoogleClient($event['source']['userId']);
                         
                         if(gettype($result) == 'string'){
                             replyText($linebot,$event['replyToken'],$result);
                         } else{
-                            $events = getCalendarEvents($result);
-                            if(empty($events)){
+                            if($message['text']=='今日行程'){
+                                $events_carousel = getTodayEvents($result);
+                            } else {
+                                $events = getCalendarEvents($result);
+                                $events_carousel = buildEventsCarousel($events);
+                            }
+                            
+                            if(empty($events_carousel)){
                                 replyText($linebot,$event['replyToken'],"快來建立活動～～");
                             } else {
-                                replyEvents($linebot,$event['replyToken'],$events);
+                                replyEvents($linebot,$event['replyToken'],$events_carousel);
                             }  
                         }
                     }

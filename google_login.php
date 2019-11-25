@@ -12,7 +12,7 @@ if(!empty($_GET['code'])){
     $client->setAuthConfig(__DIR__.'/credentials.json');
     $client->setAccessType('offline');
     $client->setPrompt('select_account consent');
-    $client->setRedirectUri('https://9846eab4.ngrok.io/bot/google_login.php');
+    $client->setRedirectUri('https://ddf3bcc1.ngrok.io/bot/google_login.php');
 
     $tokenPath = __DIR__.'/token.json';
     if (!file_exists(dirname($tokenPath))) {

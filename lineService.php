@@ -83,6 +83,26 @@ function replyDatetimePicker($linebot, $replyToken, $message){
     ]);
 }
 
+function buildEventsCarousel($events){
+    $events_array =[];
+    if (!empty($events)) {
+        foreach ($events as $event) {
+            $start = $event->start->dateTime;
+            $end = $event->end->dateTime;
+            if (empty($end)) {
+                $end = $event->end->date;
+            }
+            $start = date("Y-m-d H:i", strtotime($start));
+            $end = date("Y-m-d H:i", strtotime($end));
+            
+            $item = buildCarouselItem($event->getSummary(),$start,$end,$event->id);
+            array_push($events_array, $item);
+        }
+    }
+    return $events_array; 
+}
+
+
 
 function pushMessage($uid,$message,$channelAccessToken) {
     $token = 'Bearer '.$channelAccessToken;

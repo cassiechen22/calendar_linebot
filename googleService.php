@@ -7,7 +7,7 @@ function setGoogleClient($uid){
     $client->setAuthConfig(__DIR__.'/credentials.json');
     $client->setAccessType('offline');
     $client->setPrompt('select_account consent');
-    $client->setRedirectUri('https://9846eab4.ngrok.io/bot/google_login.php');
+    $client->setRedirectUri('https://ddf3bcc1.ngrok.io/bot/google_login.php');
     $client->setState($uid);
 
     // 利用此 uid 去 token file 找這個人的 token
@@ -84,22 +84,5 @@ function getCalendarEvents($client){
     $results = $service->events->listEvents($calendarId, $optParams);
     $events = $results->getItems();
 
-    $events_array = [];
-    $eventIds_array = [];
-
-    if (!empty($events)) {
-        foreach ($events as $event) {
-            $start = $event->start->dateTime;
-            $end = $event->end->dateTime;
-            if (empty($end)) {
-                $end = $event->end->date;
-            }
-            $start = date("Y-m-d H:i", strtotime($start));
-            $end = date("Y-m-d H:i", strtotime($end));
-            
-            $item = buildCarouselItem($event->getSummary(),$start,$end,$event->id);
-            array_push($events_array, $item);
-        }
-    }
-    return $events_array; 
+    return $events; 
 }
